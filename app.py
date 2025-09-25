@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for
 import subprocess, signal, os
+import requests
 
 app = Flask(__name__)
 
@@ -26,3 +27,17 @@ def stop():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)  # 0.0.0.0 = erreichbar im lokalen Netz
+
+@app.route("/steckdose/ein")
+def steckdose_ein():
+    ip = "http://172.20.10.5"  # IP-Adresse deiner Steckdose
+    url = f"{ip}/cm?cmnd=Power%20On"
+    requests.get(url)
+    return "Steckdose eingeschaltet!"
+
+@app.route("/steckdose/aus")
+def steckdose_aus():
+    ip = "http://172.20.10.5"  # IP-Adresse deiner Steckdose
+    url = f"{ip}/cm?cmnd=Power%20Off"
+    requests.get(url)
+    return "Steckdose ausgeschaltet!"
