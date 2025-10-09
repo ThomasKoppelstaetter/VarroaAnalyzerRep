@@ -25,6 +25,14 @@ def stop():
         process = None
     return redirect(url_for("index"))
 
+
+@app.route("/offnen")
+def start():
+    global process
+    if process is None:
+        process = subprocess.Popen(["python3", "open_cell.py"])
+    return redirect(url_for("index"))
+
 @app.route("/steckdose/ein")
 def steckdose_ein():
     ip = "http://172.20.10.5"  # IP-Adresse deiner Steckdose
