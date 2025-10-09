@@ -27,7 +27,7 @@ def stop():
 
 
 @app.route("/offnen")
-def start():
+def offnen():
     global process
     if process is None:
         process = subprocess.Popen(["python3", "open_cell.py"])
