@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>VarroaAnalyzer</title>
+    <title>Live-View</title>
 </head>
 <body>
     <nav>
@@ -11,6 +11,7 @@
         <a href="{{ url_for('settings') }}">Einstellungen</a>
     </nav>
 
-    <h1>Willkommen im VarroaAnalyzer Dashboard</h1>
+    <h1>Live Kamera Feed</h1>
+    <img src="{{ url_for('video_feed') }}" />
 </body>
 </html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Einstellungen</title>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Dashboard</a> |
+        <a href="{{ url_for('live') }}">Live-View</a> |
+        <a href="{{ url_for('settings') }}">Einstellungen</a>
+    </nav>
+
+    <h1>Python-Skript Steuerung</h1>
+    <form action="{{ url_for('start') }}" method="get">
+        <button type="submit">Start</button>
+    </form>
+    <form action="{{ url_for('stop') }}" method="get">
+        <button type="submit">Stop</button>
+    </form>
+
+    <h1>Steuerung der WLAN-Steckdose</h1>
+    <h1>Steuerung der WLAN-Steckdose</h1>
+    <a href="{{ url_for('steckdose_ein') }}"><button>Steckdose Einschalten</button></a>
+    <a href="{{ url_for('steckdose_aus') }}"><button>Steckdose Ausschalten</button></a>
+
+
+
+</body>
+</html>
