@@ -20,11 +20,20 @@
     </form>
 
     <h1>Steuerung der WLAN-Steckdose</h1>
-    <h1>Steuerung der WLAN-Steckdose</h1>
     <a href="{{ url_for('steckdose_ein') }}"><button>Steckdose Einschalten</button></a>
     <a href="{{ url_for('steckdose_aus') }}"><button>Steckdose Ausschalten</button></a>
 
+    <h2>Z-Achse</h2>
+    <button onclick="location.href='/move/z/forward'">Z hoch</button>
+    <button onclick="location.href='/move/z/backward'">Z runter</button>
 
+    <h2>X-Achse</h2>
+    <button onclick="location.href='/move/x/forward'">X vor</button>
+    <button onclick="location.href='/move/x/backward'">X zurück</button>
+
+    <h2>Y-Achse</h2>
+    <button onclick="location.href='/move/y/forward'">Y vor</button>
+    <button onclick="location.href='/move/y/backward'">Y zurück</button>
 
 </body>
 </html>

@@ -1,10 +1,14 @@
 from flask import Flask, render_template, Response, redirect, url_for
 import subprocess, signal, os, requests
+import utils_stepper
+import threading
 from camera import Camera  # nutzt picamera2
 
 app = Flask(__name__)
 camera = Camera()  # Kamera initialisieren
 process = None     # Für test_stepper.py
+
+utils_stepper.setup()
 
 # ----------- Routen -----------
 
@@ -47,6 +51,24 @@ def stop():
         process = None
     return redirect(url_for("settings"))
 
+# ======== Motorsteuerung ========
+@app.route("/move/<axis>/<direction>")
+def move(axis, direction):
+    def run():
+        if axis == "x":
+            utils_stepper.runMM_x(direction == "forward", 10)
+        elif axis == "y":
+            utils_stepper.runMM_y(direction == "forward", 10)
+        elif axis == "z":
+            utils_stepper.runMM_z(direction == "forward", 10)
+        else:
+            print("Ungültige Achse")
+
+    # Thread starten, damit Flask nicht blockiert
+    threading.Thread(target=run).start()
+    return redirect(url_for("settings"))
+
+
 # ----------- WLAN-Steckdose Steuerung -----------
 
 @app.route("/steckdose/ein")
@@ -75,4 +97,11 @@ if __name__ == "__main__":
     try:
         app.run(host="0.0.0.0", port=5000, debug=False)
     finally:
-        camera.release()
+        try:
+            camera.release()
+        except Exception as e:
+            print("Kamera konnte nicht freigegeben werden:", e)
+        try:
+            utils_stepper.shutdown()
+        except Exception as e:
+            print("Stepper konnte nicht beendet werden:", e)
