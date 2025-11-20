@@ -1,33 +1,45 @@
-# picture.py
+from sql_functions import create_bild
 import os
 from camera import Camera
 
-SAVE_DIR = "static/captures"
+BASE_DIR = "static/captures"
 
-def get_next_filename():
-    """Finde den nächsten freien Bildnamen (image1.jpg, image2.jpg, …)"""
-    os.makedirs(SAVE_DIR, exist_ok=True)
-    i = 1
-    while True:
-        filename = f"image{i}.jpg"
-        filepath = os.path.join(SAVE_DIR, filename)
-        if not os.path.exists(filepath):
-            return filepath
-        i += 1
 
-def take(camera: Camera):
+def build_filename(wabe_id, posX, posY, richtung):
+    """Erzeugt den Dateinamen nach deinem gewünschten Format."""
+    filename = f"z_{posY:02d}_{posX:02d}_{richtung}.jpg"
+    folder = os.path.join(BASE_DIR, f"wabe_{wabe_id}")
+    os.makedirs(folder, exist_ok=True)
+    return os.path.join(folder, filename), filename
+
+
+def take(camera: Camera, wabe_id, zID, posX, posY, richtung):
     """
-    Nimmt ein Bild mit der bereits initialisierten Kamera auf.
-    WICHTIG: Die Kamera wird NICHT released – das macht main.py am Ende!
+    Nimmt ein Bild mit der Kamera auf,
+    speichert es in static/captures/wabe_X/
+    und trägt es in die SQL Datenbank ein.
     """
-    save_path = get_next_filename()
-    print(f"Nehme Bild auf → {save_path}")
-    camera.capture_image(save_path)   # benutze die übergebene Kamera
-    print("Foto erfolgreich gespeichert!")
-    return save_path
+    full_path, filename = build_filename(wabe_id, posX, posY, richtung)
 
-# Nur zum Testen, wenn man picture.py direkt ausführt
+    print(f"📸 Nehme Bild auf → {full_path}")
+    camera.capture_image(full_path)   # Bild speichern
+    print("✅ Foto erfolgreich gespeichert!")
+
+    # SQL-Eintrag erzeugen
+    create_bild(
+        zID=zID,
+        namen=filename,
+        pfad=full_path,
+        varroaanzahl=None
+    )
+
+    print("📁 Bild wurde in der Datenbank eingetragen!")
+
+    return full_path
+
+
+# Nur zum Testen falls picture.py direkt aufgerufen wird
 if __name__ == "__main__":
     cam = Camera()
-    take(cam)
+    take(cam, 1, 1, 15, 0, "oben")
     cam.release()

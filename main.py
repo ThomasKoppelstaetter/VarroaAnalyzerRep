@@ -1,4 +1,4 @@
-from sql_functions import create_wabe, create_zelle, create_bild
+from sql_functions import create_wabe, create_zelle
 import utils_stepper
 import subprocess
 import time
@@ -58,6 +58,7 @@ try:
             posX = posX +1
 
         posY = posY +1
+        posX = 0
         # Nach einer kompletten Reihe: zurück an den Anfang der nächsten Reihe
         utils_stepper.runCell_y(False, 1)
         utils_stepper.runCell_x(False, x_Cells)
