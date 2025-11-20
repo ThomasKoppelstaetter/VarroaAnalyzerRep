@@ -1,8 +1,12 @@
+from sql_functions import create_wabe, create_zelle, create_bild
 import utils_stepper
 import subprocess
 import time
 from camera import Camera
 import picture
+
+posX = 00
+posY = 00
 
 # Anzahl der Zellen in X- und Y-Richtung
 x_Cells = 20
@@ -11,8 +15,10 @@ y_Cells = 10
 try:
     camera = Camera()                  # Kamera einmalig initialisieren
     utils_stepper.setup()
+    wID = create_wabe()
 
     for y in range(y_Cells):
+        zID = create_zelle(wID, posX, posY)
         for x in range(x_Cells):
             # Warten
             time.sleep(0.8)
@@ -49,6 +55,7 @@ try:
 
             # Geht 1 nach links (nächste Spalte)
             utils_stepper.runCell_x(True, 1)
+            posX = posX +1
 
         # Nach einer kompletten Reihe: zurück an den Anfang der nächsten Reihe
         utils_stepper.runCell_y(False, 1)

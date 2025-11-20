@@ -1,3 +1,4 @@
+from sql_functions import update_zelle_stadium, update_bild_varroaanzahl
 from picamera2 import Picamera2
 import cv2
 import time
