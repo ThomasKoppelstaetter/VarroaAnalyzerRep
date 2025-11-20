@@ -24,7 +24,7 @@ try:
             time.sleep(0.8)
 
             # Foto oben
-            picture.take(camera)       # Kamera-Objekt übergeben
+            picture.take(camera, wID, zID, posX, posY, "oben")       # Kamera-Objekt übergeben
             time.sleep(0.5)
 
             # Wechselt auf Öffner
@@ -41,7 +41,7 @@ try:
             time.sleep(0.8)
 
             # Foto unten
-            picture.take(camera)
+            picture.take(camera, wID, zID, posX, posY, "unten")
             time.sleep(0.5)
 
             # Geht nach oben
