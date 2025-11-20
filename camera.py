@@ -1,45 +1,30 @@
-from sql_functions import create_bild
+from picamera2 import Picamera2
+import cv2
+import time
 import os
-from camera import Camera
 
-BASE_DIR = "static/captures"
+class Camera:
+    def __init__(self):
+        self.picam2 = Picamera2()
+        self.picam2.configure(self.picam2.create_preview_configuration(main={"size": (640, 480)}))
+        self.picam2.start()
 
+    def gen_frames(self):
+        while True:
+            frame = self.picam2.capture_array()
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame_bytes = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
-def build_filename(wabe_id, posX, posY, richtung):
-    """Erzeugt den Dateinamen nach deinem gewünschten Format."""
-    filename = f"z_{posY:02d}_{posX:02d}_{richtung}.jpg"
-    folder = os.path.join(BASE_DIR, f"wabe_{wabe_id}")
-    os.makedirs(folder, exist_ok=True)
-    return os.path.join(folder, filename), filename
+    # 🔹 NEU: Funktion zum Aufnehmen eines einzelnen Bildes
+    def capture_image(self, filename=None):
+        if filename is None:
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            filename = f"static/captures/image_{timestamp}.jpg"
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        self.picam2.capture_file(filename)
+        print(f"✅ Bild gespeichert unter: {filename}")
 
-
-def take(camera: Camera, wabe_id, zID, posX, posY, richtung):
-    """
-    Nimmt ein Bild mit der Kamera auf,
-    speichert es in static/captures/wabe_X/
-    und trägt es in die SQL Datenbank ein.
-    """
-    full_path, filename = build_filename(wabe_id, posX, posY, richtung)
-
-    print(f"📸 Nehme Bild auf → {full_path}")
-    camera.capture_image(full_path)   # Bild speichern
-    print("✅ Foto erfolgreich gespeichert!")
-
-    # SQL-Eintrag erzeugen
-    create_bild(
-        zID=zID,
-        namen=filename,
-        pfad=full_path,
-        varroaanzahl=None
-    )
-
-    print("📁 Bild wurde in der Datenbank eingetragen!")
-
-    return full_path
-
-
-# Nur zum Testen falls picture.py direkt aufgerufen  wird
-if __name__ == "__main__":
-    cam = Camera()
-    take(cam, 1, 1, 15, 0, "oben")
-    cam.release()
+    def release(self):
+        self.picam2.stop()
