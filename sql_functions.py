@@ -6,7 +6,7 @@ def get_connection():
     return mysql.connector.connect(
         host='localhost',
         user='root',
-        password='dein_passwort',  # hier dein Passwort eintragen
+        password='',
         database='varroaanalyzer'
     )
 
