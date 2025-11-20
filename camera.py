@@ -24,7 +24,6 @@ class Camera:
             filename = f"static/captures/image_{timestamp}.jpg"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         self.picam2.capture_file(filename)
-        print(f"✅ Bild gespeichert unter: {filename}")
 
     def release(self):
         self.picam2.stop()
