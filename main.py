@@ -18,8 +18,8 @@ try:
     wID = create_wabe()
 
     for y in range(y_Cells):
-        zID = create_zelle(wID, posX, posY)
         for x in range(x_Cells):
+            zID = create_zelle(wID, posX, posY)
             # Warten
             time.sleep(0.8)
 
@@ -57,6 +57,7 @@ try:
             utils_stepper.runCell_x(True, 1)
             posX = posX +1
 
+        posY = posY +1
         # Nach einer kompletten Reihe: zurück an den Anfang der nächsten Reihe
         utils_stepper.runCell_y(False, 1)
         utils_stepper.runCell_x(False, x_Cells)
