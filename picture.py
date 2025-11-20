@@ -1,3 +1,4 @@
+# picture.py
 import os
 from camera import Camera
 
@@ -14,16 +15,19 @@ def get_next_filename():
             return filepath
         i += 1
 
-def take():
-    """Nimmt ein Bild auf und speichert es automatisch"""
-    camera = Camera()
+def take(camera: Camera):
+    """
+    Nimmt ein Bild mit der bereits initialisierten Kamera auf.
+    WICHTIG: Die Kamera wird NICHT released – das macht main.py am Ende!
+    """
     save_path = get_next_filename()
-    print(f"📸 Nehme Bild auf → {save_path}")
-    camera.capture_image(save_path)
-    camera.release()
-    print("✅ Foto erfolgreich gespeichert!")
+    print(f"Nehme Bild auf → {save_path}")
+    camera.capture_image(save_path)   # benutze die übergebene Kamera
+    print("Foto erfolgreich gespeichert!")
     return save_path
 
-# Damit man picture.py auch standalone ausführen kann
+# Nur zum Testen, wenn man picture.py direkt ausführt
 if __name__ == "__main__":
-    take()
+    cam = Camera()
+    take(cam)
+    cam.release()
