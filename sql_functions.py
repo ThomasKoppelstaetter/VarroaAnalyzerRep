@@ -96,13 +96,22 @@ def get_zellen_by_wabe(wID):
             z.PosX,
             z.PosY,
             z.Stadium,
-            (
-                SELECT b.Varroaanzahl
-                FROM Bilder b
-                WHERE b.zID = z.zID
-                ORDER BY b.bID ASC
-                LIMIT 1
-            ) AS Varroaanzahl
+            -- erstes Bild oben
+            (SELECT b.Varroaanzahl
+             FROM Bilder b
+             WHERE b.zID = z.zID
+             ORDER BY b.bID ASC
+             LIMIT 1) AS Varroaanzahl,
+            (SELECT b.Pfad
+             FROM Bilder b
+             WHERE b.zID = z.zID AND b.Namen LIKE '%oben%'
+             ORDER BY b.bID ASC
+             LIMIT 1) AS BildOben,
+            (SELECT b.Pfad
+             FROM Bilder b
+             WHERE b.zID = z.zID AND b.Namen LIKE '%unten%'
+             ORDER BY b.bID ASC
+             LIMIT 1) AS BildUnten
         FROM Zelle z
         WHERE z.wID = %s
         ORDER BY z.PosY, z.PosX

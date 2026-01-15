@@ -34,14 +34,34 @@
     <th>PosY</th>
     <th>Stadium</th>
     <th>Varroaanzahl</th>
+    <th>Bild Oben</th>
+    <th>Bild Unten</th>
 </tr>
 
 {% for z in zellen %}
 <tr>
     <td>{{ z.PosX }}</td>
     <td>{{ z.PosY }}</td>
-    <td>{{ z.Stadium or "-" }}</td>
-    <td>{{ z.Varroaanzahl if z.Varroaanzahl is not none else "—" }}</td>
+    <td>{{ z.Stadium or '-' }}</td>
+    <td>{{ z.Varroaanzahl if z.Varroaanzahl is not none else '—' }}</td>
+    <td>
+        {% if z.BildOben %}
+        <a href="{{ url_for('static', filename=z.BildOben.replace('static/', '')) }}" target="_blank">
+            Oben
+        </a>
+        {% else %}
+        —
+        {% endif %}
+    </td>
+    <td>
+        {% if z.BildUnten %}
+        <a href="{{ url_for('static', filename=z.BildUnten.replace('static/', '')) }}" target="_blank">
+            Unten
+        </a>
+        {% else %}
+        —
+        {% endif %}
+    </td>
 </tr>
 {% endfor %}
 </table>
