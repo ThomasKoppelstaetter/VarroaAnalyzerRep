@@ -26,7 +26,7 @@ def take(camera: Camera, wabe_id, zID, posX, posY, richtung):
     results = model(full_path)
 
     varroa_count = 0
-    stadium = None
+    stadium = 'empty'
     max_conf = 0.0
 
     for result in results:
