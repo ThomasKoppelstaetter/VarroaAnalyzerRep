@@ -1,16 +1,51 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>VarroaAnalyzer</title>
+<meta charset="UTF-8">
+<title>VarroaAnalyzer</title>
 </head>
 <body>
-    <nav>
-        <a href="{{ url_for('index') }}">Dashboard</a> |
-        <a href="{{ url_for('live') }}">Live-View</a> |
-        <a href="{{ url_for('settings') }}">Einstellungen</a>
-    </nav>
 
-    <h1>Willkommen im VarroaAnalyzer Dashboard</h1>
+<nav>
+    <a href="{{ url_for('index') }}">Dashboard</a> |
+    <a href="{{ url_for('live') }}">Live-View</a> |
+    <a href="{{ url_for('settings') }}">Einstellungen</a>
+</nav>
+
+<h1>VarroaAnalyzer Dashboard</h1>
+
+<form method="get">
+    <label>Wabe auswählen:</label>
+    <select name="wID" onchange="this.form.submit()">
+        <option value="">-- bitte wählen --</option>
+        {% for w in waben %}
+            <option value="{{ w.wID }}"
+                {% if w.wID == selected_wID %}selected{% endif %}>
+                Wabe {{ w.wID }} ({{ w.Datum }})
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
+{% if selected_wID %}
+<table border="1" cellpadding="6">
+<tr>
+    <th>PosX</th>
+    <th>PosY</th>
+    <th>Stadium</th>
+    <th>Varroaanzahl</th>
+</tr>
+
+{% for z in zellen %}
+<tr>
+    <td>{{ z.PosX }}</td>
+    <td>{{ z.PosY }}</td>
+    <td>{{ z.Stadium or "-" }}</td>
+    <td>{{ z.Varroaanzahl if z.Varroaanzahl is not none else "—" }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
 </body>
 </html>

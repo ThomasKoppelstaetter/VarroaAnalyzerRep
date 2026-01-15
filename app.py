@@ -3,6 +3,7 @@ import subprocess, signal, os, requests
 import utils_stepper
 import threading
 from camera import Camera  # nutzt picamera2
+from flask import request
 
 app = Flask(__name__)
 camera = Camera()  # Kamera initialisieren
@@ -14,7 +15,17 @@ utils_stepper.setup()
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    wID = request.args.get("wID", type=int)
+
+    waben = get_waben()
+    zellen = get_zellen_by_wabe(wID) if wID else []
+
+    return render_template(
+        "index.html",
+        waben=waben,
+        selected_wID=wID,
+        zellen=zellen
+    )
 
 @app.route("/live")
 def live():

@@ -75,3 +75,39 @@ def update_bild_varroaanzahl(bID, varroaanzahl):
     cursor.close()
     conn.close()
     print(f"Bild {bID} Varroaanzahl auf {varroaanzahl} aktualisiert")
+
+
+# Für die Tabbelen ausgabe
+def get_waben():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT wID, Datum FROM Wabe ORDER BY Datum DESC")
+    data = cursor.fetchall()
+    conn.close()
+    return data
+
+# Für die Tabbelen ausgabe
+def get_zellen_by_wabe(wID):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            z.PosX,
+            z.PosY,
+            z.Stadium,
+            (
+                SELECT b.Varroaanzahl
+                FROM Bilder b
+                WHERE b.zID = z.zID
+                ORDER BY b.bID ASC
+                LIMIT 1
+            ) AS Varroaanzahl
+        FROM Zelle z
+        WHERE z.wID = %s
+        ORDER BY z.PosY, z.PosX
+    """, (wID,))
+
+    data = cursor.fetchall()
+    conn.close()
+    return data
