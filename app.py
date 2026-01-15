@@ -3,7 +3,9 @@ import subprocess, signal, os, requests
 import utils_stepper
 import threading
 from camera import Camera  # nutzt picamera2
+from sql_functions import get_waben, get_zellen_by_wabe
 from flask import request
+
 
 app = Flask(__name__)
 camera = Camera()  # Kamera initialisieren
