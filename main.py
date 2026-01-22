@@ -26,6 +26,8 @@ def main_scan(camera):
     global running
     running = True
 
+    utils_stepper.setup()
+
     posX = 0
     posY = 0
 
