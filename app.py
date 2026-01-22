@@ -49,18 +49,21 @@ def video_feed():
 
 @app.route("/start")
 def start():
-    """Startet das Stepper-Skript"""
     global process
     if process is None:
-        process = subprocess.Popen(["python3", "test_stepper.py"])
+        process = subprocess.Popen(
+            ["python3", "main.py"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
     return redirect(url_for("settings"))
 
 @app.route("/stop")
 def stop():
-    """Stoppt das Stepper-Skript"""
     global process
     if process is not None:
-        os.kill(process.pid, signal.SIGTERM)
+        process.terminate()  # sendet SIGTERM
+        process.wait(timeout=5)
         process = None
     return redirect(url_for("settings"))
 

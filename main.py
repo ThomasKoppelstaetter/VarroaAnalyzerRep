@@ -1,74 +1,140 @@
+# main.py
 from sql_functions import create_wabe, create_zelle
 import utils_stepper
-import subprocess
 import time
+import signal
 from camera import Camera
 import picture
 
-posX = 00
-posY = 00
+# =========================
+# GLOBALE STEUERUNG
+# =========================
 
-# Anzahl der Zellen in X- und Y-Richtung
+running = True
+
+def return_to_zero(posX, posY):
+    print(f"Rückfahrt zu (0,0) von ({posX},{posY})")
+
+    # Z-Achse zuerst hoch (Sicherheitsposition)
+    utils_stepper.runMM_z(False, 30)
+
+    # X zurück
+    if posX > 0:
+        utils_stepper.runCell_x(False, posX)
+
+    # Y zurück
+    if posY > 0:
+        utils_stepper.runCell_y(True, posY)
+
+    print("Position (0,0) erreicht")
+
+def shutdown_handler(signum, frame):
+    global running
+    print("Shutdown-Signal empfangen")
+    running = False
+
+signal.signal(signal.SIGTERM, shutdown_handler)
+signal.signal(signal.SIGINT, shutdown_handler)
+
+# =========================
+# KONFIGURATION
+# =========================
+
 x_Cells = 20
 y_Cells = 10
 
-try:
-    camera = Camera()                  # Kamera einmalig initialisieren
-    utils_stepper.setup()
-    wID = create_wabe()
+# =========================
+# MAIN LOGIK
+# =========================
 
-    for y in range(y_Cells):
-        for x in range(x_Cells):
-            zID = create_zelle(wID, posX, posY)
-            # Warten
-            time.sleep(0.8)
+def main():
+    global running
 
-            # Foto oben
-            picture.take(camera, wID, zID, posX, posY, "oben")       # Kamera-Objekt übergeben
-            time.sleep(0.5)
+    posX = 0
+    posY = 0
 
-            # Wechselt auf Öffner
-            utils_stepper.runCell_x(True, 8)
+    camera = None
 
-            # Geht nach unten
-            utils_stepper.runMM_z(True, 20)
+    try:
+        print("Main gestartet")
 
-            # Öffnet Zelle (auskommentiert, falls Pumpe verwendet wird)
-            # subprocess.run(['python3', 'open_cell.py'])
+        camera = Camera()
+        utils_stepper.setup()
 
-            # Geht nur teilweise nach oben
-            utils_stepper.runMM_z(False, 10)
-            time.sleep(0.8)
+        wID = create_wabe()
+        print(f"Wabe erstellt: ID {wID}")
 
-            # Foto unten
-            picture.take(camera, wID, zID, posX, posY, "unten")
-            time.sleep(0.5)
+        for y in range(y_Cells):
+            if not running:
+                break
 
-            # Geht nach oben
-            utils_stepper.runMM_z(False, 10)
+            for x in range(x_Cells):
+                if not running:
+                    break
 
-            # Wechselt zurück auf Öffner (falls benötigt)
-            # utils_stepper.runCell_x(False, 3)
+                print(f"Zelle X={posX}, Y={posY}")
 
-            # Geht zurück auf Kamera
-            utils_stepper.runCell_x(False, 8)
+                zID = create_zelle(wID, posX, posY)
 
-            # Geht 1 nach links (nächste Spalte)
-            utils_stepper.runCell_x(True, 1)
-            posX = posX +1
+                time.sleep(0.8)
 
-        posY = posY +1
-        posX = 0
-        # Nach einer kompletten Reihe: zurück an den Anfang der nächsten Reihe
-        utils_stepper.runCell_y(False, 1)
-        utils_stepper.runCell_x(False, x_Cells)
+                # Foto oben
+                picture.take(camera, wID, zID, posX, posY, "oben")
+                time.sleep(0.5)
 
-    # Alles fertig
-    utils_stepper.runCell_y(True, y_Cells)
-    utils_stepper.shutdown()
-    print("Cells done")
+                # Öffnerposition
+                utils_stepper.runCell_x(True, 8)
 
-except KeyboardInterrupt:
-    print("Program terminated")
-    camera.release()                   # Kamera im Fehlerfall freigeben
-    utils_stepper.shutdown()
+                # Nach unten
+                utils_stepper.runMM_z(True, 20)
+
+                # Optional: Zelle öffnen
+                # subprocess.run(['python3', 'open_cell.py'])
+
+                # Teilweise hoch
+                utils_stepper.runMM_z(False, 10)
+                time.sleep(0.8)
+
+                # Foto unten
+                picture.take(camera, wID, zID, posX, posY, "unten")
+                time.sleep(0.5)
+
+                # Ganz hoch
+                utils_stepper.runMM_z(False, 10)
+
+                # Zurück zur Kamera
+                utils_stepper.runCell_x(False, 8)
+
+                # Nächste Zelle
+                utils_stepper.runCell_x(True, 1)
+                posX += 1
+
+            # Neue Reihe
+            posY += 1
+            posX = 0
+
+            utils_stepper.runCell_y(False, 1)
+            utils_stepper.runCell_x(False, x_Cells)
+
+        print("Scan abgeschlossen")
+
+    finally:
+        print("Cleanup läuft...")
+
+        if not running:
+            print("Abbruch erkannt → fahre zurück auf (0,0)")
+            return_to_zero(posX, posY)
+
+        if camera:
+            camera.release()
+
+        utils_stepper.shutdown()
+
+        print("Main sauber beendet")
+
+# =========================
+# STARTPUNKT
+# =========================
+
+if __name__ == "__main__":
+    main()
