@@ -51,11 +51,8 @@ def video_feed():
 def start():
     global process
     if process is None:
-        process = subprocess.Popen(
-            ["python3", "main.py"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+        main_path = os.path.join(os.path.dirname(__file__), "main.py")
+        process = subprocess.Popen(["python3", main_path])
     return redirect(url_for("settings"))
 
 @app.route("/stop")
