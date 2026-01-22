@@ -7,7 +7,6 @@ from sql_functions import get_waben, get_zellen_by_wabe
 from main import main_scan, stop_scan
 
 
-
 app = Flask(__name__)
 camera = Camera()  # Kamera initialisieren
 process = None     # Für test_stepper.py
@@ -59,9 +58,9 @@ def start():
 @app.route("/stop")
 def stop():
     global process
-    stop_scan()  # Signal an main_scan senden
+    stop_scan()
     if process:
-        process.join(timeout=5)  # auf Thread Ende warten
+        process.join()
         process = None
     return redirect(url_for("settings"))
 

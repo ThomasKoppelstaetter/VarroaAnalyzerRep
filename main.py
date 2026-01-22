@@ -24,13 +24,13 @@ def stop_scan():
 def main_scan(camera):
     """Führt den Zell-Scan durch. Kamera wird übergeben."""
     global running
+    running = True
 
     posX = 0
     posY = 0
 
     print("Main Scan gestartet")
 
-    utils_stepper.setup()
 
     wID = create_wabe()
     print(f"Wabe erstellt: ID {wID}")
