@@ -12,22 +12,6 @@ import picture
 
 running = True
 
-def return_to_zero(posX, posY):
-    print(f"Rückfahrt zu (0,0) von ({posX},{posY})")
-
-    # Z-Achse zuerst hoch (Sicherheitsposition)
-    utils_stepper.runMM_z(False, 30)
-
-    # X zurück
-    if posX > 0:
-        utils_stepper.runCell_x(False, posX)
-
-    # Y zurück
-    if posY > 0:
-        utils_stepper.runCell_y(True, posY)
-
-    print("Position (0,0) erreicht")
-
 def shutdown_handler(signum, frame):
     global running
     print("Shutdown-Signal empfangen")
@@ -121,14 +105,16 @@ def main():
     finally:
         print("Cleanup läuft...")
 
-        if not running:
-            print("Abbruch erkannt → fahre zurück auf (0,0)")
-            return_to_zero(posX, posY)
+        try:
+            if camera:
+                camera.release()
+        except Exception as e:
+            print("Fehler beim Kamera-Release:", e)
 
-        if camera:
-            camera.release()
-
-        utils_stepper.shutdown()
+        try:
+            utils_stepper.shutdown()
+        except Exception as e:
+            print("Fehler beim Stepper-Shutdown:", e)
 
         print("Main sauber beendet")
 
