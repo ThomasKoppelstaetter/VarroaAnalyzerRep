@@ -1,10 +1,11 @@
-from flask import Flask, render_template, Response, redirect, url_for
-import subprocess, signal, os, requests
-import utils_stepper
+from flask import Flask, render_template, Response, redirect, url_for, request
 import threading
+import utils_stepper
+import requests
 from camera import Camera  # nutzt picamera2
 from sql_functions import get_waben, get_zellen_by_wabe
-from flask import request
+from main import main_scan, stop_scan
+
 
 
 app = Flask(__name__)
@@ -45,22 +46,22 @@ def video_feed():
     return Response(camera.gen_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-# ----------- Stepper Motor Steuerung -----------
+# ----------- Main Programm Scan starten -----------
 
 @app.route("/start")
 def start():
     global process
-    if process is None:
-        main_path = os.path.join(os.path.dirname(__file__), "main.py")
-        process = subprocess.Popen(["python3", main_path])
+    if process is None or not process.is_alive():
+        process = threading.Thread(target=main_scan, args=(camera,))
+        process.start()
     return redirect(url_for("settings"))
 
 @app.route("/stop")
 def stop():
     global process
-    if process is not None:
-        process.terminate()  # sendet SIGTERM
-        process.wait(timeout=5)
+    stop_scan()  # Signal an main_scan senden
+    if process:
+        process.join(timeout=5)  # auf Thread Ende warten
         process = None
     return redirect(url_for("settings"))
 
