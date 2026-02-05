@@ -3,69 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <title>VarroaAnalyzer</title>
+
+<!-- Tabler CSS -->
+<link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+<!-- Tabler Icons -->
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet">
 </head>
+
 <body>
 
-<nav>
-    <a href="{{ url_for('index') }}">Dashboard</a> |
-    <a href="{{ url_for('live') }}">Live-View</a> |
-    <a href="{{ url_for('settings') }}">Einstellungen</a>
-</nav>
-
-<h1>VarroaAnalyzer Dashboard</h1>
-
-<form method="get">
-    <label>Wabe auswählen:</label>
-    <select name="wID" onchange="this.form.submit()">
-        <option value="">-- bitte wählen --</option>
-        {% for w in waben %}
-            <option value="{{ w.wID }}"
-                {% if w.wID == selected_wID %}selected{% endif %}>
-                Wabe {{ w.wID }} ({{ w.Datum }})
-            </option>
-        {% endfor %}
-    </select>
-</form>
-
-{% if selected_wID %}
-<table border="1" cellpadding="6">
-<tr>
-    <th>PosX</th>
-    <th>PosY</th>
-    <th>Stadium</th>
-    <th>Varroaanzahl</th>
-    <th>Bild Oben</th>
-    <th>Bild Unten</th>
-</tr>
-
-{% for z in zellen %}
-<tr>
-    <td>{{ z.PosX }}</td>
-    <td>{{ z.PosY }}</td>
-    <td>{{ z.Stadium or '-' }}</td>
-    <td>{{ z.Varroaanzahl if z.Varroaanzahl is not none else '—' }}</td>
-    <td>
-        {% if z.BildOben %}
-        <a href="{{ url_for('static', filename=z.BildOben.replace('static/', '')) }}" target="_blank">
-            Oben
+<header class="navbar navbar-expand-md navbar-light">
+    <div class="container-xl">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            🐝 VarroaAnalyzer
         </a>
-        {% else %}
-        —
-        {% endif %}
-    </td>
-    <td>
-        {% if z.BildUnten %}
-        <a href="{{ url_for('static', filename=z.BildUnten.replace('static/', '')) }}" target="_blank">
-            Unten
-        </a>
-        {% else %}
-        —
-        {% endif %}
-    </td>
-</tr>
-{% endfor %}
-</table>
-{% endif %}
+
+        <div class="navbar-nav">
+            <a class="nav-link active" href="{{ url_for('index') }}">
+                <i class="ti ti-layout-dashboard"></i>
+                Dashboard
+            </a>
+            <a class="nav-link" href="{{ url_for('live') }}">
+                <i class="ti ti-video"></i>
+                Live-View
+            </a>
+            <a class="nav-link" href="{{ url_for('settings') }}">
+                <i class="ti ti-settings"></i>
+                Einstellungen
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="page-wrapper">
+    <div class="page-body">
+        <div class="container-xl">
+
+            <h1 class="mb-4">VarroaAnalyzer Dashboard</h1>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get">
+                        <label class="form-label">Wabe auswählen:</label>
+                        <select name="wID" class="form-select w-auto" onchange="this.form.submit()">
+                            <option value="">-- bitte wählen --</option>
+                            {% for w in waben %}
+                                <option value="{{ w.wID }}"
+                                    {% if w.wID == selected_wID %}selected{% endif %}>
+                                    Wabe {{ w.wID }} ({{ w.Datum }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            {% if selected_wID %}
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table table-striped">
+                        <tr>
+                            <th>PosX</th>
+                            <th>PosY</th>
+                            <th>Stadium</th>
+                            <th>Varroaanzahl</th>
+                            <th>Bild Oben</th>
+                            <th>Bild Unten</th>
+                        </tr>
+
+                        {% for z in zellen %}
+                        <tr>
+                            <td>{{ z.PosX }}</td>
+                            <td>{{ z.PosY }}</td>
+                            <td>{{ z.Stadium or '-' }}</td>
+                            <td>{{ z.Varroaanzahl if z.Varroaanzahl is not none else '—' }}</td>
+                            <td>
+                                {% if z.BildOben %}
+                                <a class="btn btn-sm btn-outline-primary"
+                                   href="{{ url_for('static', filename=z.BildOben.replace('static/', '')) }}"
+                                   target="_blank">
+                                    Oben
+                                </a>
+                                {% else %}
+                                —
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if z.BildUnten %}
+                                <a class="btn btn-sm btn-outline-primary"
+                                   href="{{ url_for('static', filename=z.BildUnten.replace('static/', '')) }}"
+                                   target="_blank">
+                                    Unten
+                                </a>
+                                {% else %}
+                                —
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

@@ -3,15 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>Live-View</title>
-</head>
-<body>
-    <nav>
-        <a href="{{ url_for('index') }}">Dashboard</a> |
-        <a href="{{ url_for('live') }}">Live-View</a> |
-        <a href="{{ url_for('settings') }}">Einstellungen</a>
-    </nav>
 
-    <h1>Live Kamera Feed</h1>
-    <img src="{{ url_for('video_feed') }}" />
+    <!-- Tabler CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<header class="navbar navbar-expand-md navbar-light">
+    <div class="container-xl">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            🐝 VarroaAnalyzer
+        </a>
+
+        <div class="navbar-nav">
+            <a class="nav-link" href="{{ url_for('index') }}">
+                <i class="ti ti-layout-dashboard"></i>
+                 Dashboard
+            </a>
+            <a class="nav-link active" href="{{ url_for('live') }}">
+                <i class="ti ti-video"></i>
+                 Live-View
+            </a>
+            <a class="nav-link" href="{{ url_for('settings') }}">
+                <i class="ti ti-settings"></i>
+                 Einstellungen
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="page-wrapper">
+    <div class="page-body">
+        <div class="container-xl">
+
+            <h1 class="mb-4">Live Kamera Feed</h1>
+
+            <div class="card">
+                <div class="card-body text-center">
+                    <img
+                        src="{{ url_for('video_feed') }}"
+                        class="img-fluid rounded"
+                        alt="Loading..."
+                    />
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 </body>
-</html>
+</h

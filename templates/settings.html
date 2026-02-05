@@ -3,37 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <title>Einstellungen</title>
+
+    <!-- Tabler CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css" rel="stylesheet">
 </head>
+
 <body>
-    <nav>
-        <a href="{{ url_for('index') }}">Dashboard</a> |
-        <a href="{{ url_for('live') }}">Live-View</a> |
-        <a href="{{ url_for('settings') }}">Einstellungen</a>
-    </nav>
 
-    <h1>Python-Skript Steuerung</h1>
-    <form action="{{ url_for('start') }}" method="get">
-        <button type="submit">Start</button>
-    </form>
-    <form action="{{ url_for('stop') }}" method="get">
-        <button type="submit">Stop</button>
-    </form>
+<header class="navbar navbar-expand-md navbar-light">
+    <div class="container-xl">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            🐝 VarroaAnalyzer
+        </a>
 
-    <h1>Steuerung der WLAN-Steckdose</h1>
-    <a href="{{ url_for('steckdose_ein') }}"><button>Steckdose Einschalten</button></a>
-    <a href="{{ url_for('steckdose_aus') }}"><button>Steckdose Ausschalten</button></a>
+        <div class="navbar-nav">
+            <a class="nav-link" href="{{ url_for('index') }}">
+                <i class="ti ti-layout-dashboard"></i>
+                Dashboard
+            </a>
+            <a class="nav-link" href="{{ url_for('live') }}">
+                <i class="ti ti-video"></i>
+                Live-View
+            </a>
+            <a class="nav-link active" href="{{ url_for('settings') }}">
+                <i class="ti ti-settings"></i>
+                Einstellungen
+            </a>
+        </div>
+    </div>
+</header>
 
-    <h2>Z-Achse</h2>
-    <button onclick="location.href='/move/z/forward'">runter</button>
-    <button onclick="location.href='/move/z/backward'">hoch</button>
+<div class="page-wrapper">
+    <div class="page-body">
+        <div class="container-xl">
 
-    <h2>X-Achse</h2>
-    <button onclick="location.href='/move/x/forward'">links</button>
-    <button onclick="location.href='/move/x/backward'">rechts</button>
+            <!-- Python Skript -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="ti ti-player-play"></i>
+                        Python-Skript Steuerung
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('start') }}" method="get" class="d-inline">
+                        <button class="btn btn-success">
+                            <i class="ti ti-play"></i> Start
+                        </button>
+                    </form>
+                    <form action="{{ url_for('stop') }}" method="get" class="d-inline">
+                        <button class="btn btn-danger">
+                            <i class="ti ti-stop"></i> Stop
+                        </button>
+                    </form>
+                </div>
+            </div>
 
-    <h2>Y-Achse</h2>
-    <button onclick="location.href='/move/y/forward'">vor</button>
-    <button onclick="location.href='/move/y/backward'">zurück</button>
+            <!-- Steckdose -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="ti ti-plug"></i>
+                        WLAN-Steckdose
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('steckdose_ein') }}" class="btn btn-primary">
+                        <i class="ti ti-power"></i> Einschalten
+                    </a>
+                    <a href="{{ url_for('steckdose_aus') }}" class="btn btn-outline-secondary">
+                        <i class="ti ti-power-off"></i> Ausschalten
+                    </a>
+                </div>
+            </div>
+
+            <!-- Achsensteuerung -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="ti ti-arrows-move"></i>
+                        Achsensteuerung
+                    </h3>
+                </div>
+                <div class="card-body">
+
+                    <h4>Z-Achse</h4>
+                    <button class="btn btn-outline-primary mb-3"
+                            onclick="location.href='/move/z/forward'">
+                        <i class="ti ti-arrow-down"></i> runter
+                    </button>
+                    <button class="btn btn-outline-primary mb-3"
+                            onclick="location.href='/move/z/backward'">
+                        <i class="ti ti-arrow-up"></i> hoch
+                    </button>
+
+                    <h4>X-Achse</h4>
+                    <button class="btn btn-outline-primary mb-3"
+                            onclick="location.href='/move/x/forward'">
+                        <i class="ti ti-arrow-left"></i> links
+                    </button>
+                    <button class="btn btn-outline-primary mb-3"
+                            onclick="location.href='/move/x/backward'">
+                        <i class="ti ti-arrow-right"></i> rechts
+                    </button>
+
+                    <h4>Y-Achse</h4>
+                    <button class="btn btn-outline-primary"
+                            onclick="location.href='/move/y/forward'">
+                        <i class="ti ti-arrow-up"></i> vor
+                    </button>
+                    <button class="btn btn-outline-primary"
+                            onclick="location.href='/move/y/backward'">
+                        <i class="ti ti-arrow-down"></i> zurück
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
