@@ -100,6 +100,8 @@ def main_scan(camera):
                 utils_stepper.runCell_x(True, 1)
 
             # Neue Reihe: X zurücksetzen, Y weiter
+            if not running:
+                break
             utils_stepper.runCell_y(False, 1)
             utils_stepper.runCell_x(False, x_Cells)
 
