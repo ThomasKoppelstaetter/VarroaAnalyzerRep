@@ -1,8 +1,10 @@
 # main.py
 from sql_functions import create_wabe, create_zelle
 import utils_stepper
-import time
 import picture
+import requests
+import subprocess
+import os
 
 # =========================
 # KONFIGURATION
@@ -11,11 +13,34 @@ import picture
 x_Cells = 20
 y_Cells = 10
 
+STECKDOSE_IP = "http://172.20.10.5"
+
+# Versatz vom Öffner (Nullpunkt)
+KAMERA_OFFSET = 8   # Kamera ist +8 Zellen vom Öffner
+PUMPE_OFFSET  = 3   # Pumpe ist -3 Zellen vom Öffner
+
+# =========================
+# HILFSFUNKTIONEN
+# =========================
+
+def steckdose(ein: bool):
+    cmd = "Power%20On" if ein else "Power%20Off"
+    try:
+        requests.get(f"{STECKDOSE_IP}/cm?cmnd={cmd}", timeout=3)
+        print(f"Steckdose {'ein' if ein else 'aus'}")
+    except requests.RequestException as e:
+        print(f"Steckdose nicht erreichbar: {e}")
+
+def open_cell():
+    script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "open_cell.py")
+    subprocess.run(["python3", script])
+    print("Zelle ist geöffnet")
+
 # =========================
 # MAIN LOGIK ALS FUNKTION
 # =========================
 
-running = True  # global für Stop-Signal
+running = True
 
 def stop_scan():
     global running
@@ -26,13 +51,7 @@ def main_scan(camera):
     global running
     running = True
 
-    utils_stepper.setup()
-
-    posX = 0
-    posY = 0
-
     print("Main Scan gestartet")
-
 
     wID = create_wabe()
     print(f"Wabe erstellt: ID {wID}")
@@ -46,42 +65,41 @@ def main_scan(camera):
                 if not running:
                     break
 
-                print(f"Zelle X={posX}, Y={posY}")
+                print(f"--- Zelle X={x}, Y={y} ---")
 
-                zID = create_zelle(wID, posX, posY)
-                time.sleep(0.8)
+                zID = create_zelle(wID, x, y)
 
-                # Foto oben
-                picture.take(camera, wID, zID, posX, posY, "oben")
-                time.sleep(0.5)
-
-                # Öffnerposition
-                utils_stepper.runCell_x(True, 8)
-
-                # Nach unten
+                # 1. Zelle öffnen (Öffner ist Nullpunkt, bereits über der Zelle)
                 utils_stepper.runMM_z(True, 20)
+                open_cell()
+                utils_stepper.runMM_z(False, 20)
 
-                # Teilweise hoch
-                utils_stepper.runMM_z(False, 10)
-                time.sleep(0.8)
+                # 2. Foto oben (Kamera ist +8 vom Öffner)
+                utils_stepper.runCell_x(False, KAMERA_OFFSET)   # Kamera über Zelle
+                utils_stepper.runMM_z(True, 20)
+                picture.take(camera, wID, zID, x, y, "oben")
+                utils_stepper.runMM_z(False, 20)
+                utils_stepper.runCell_x(True, KAMERA_OFFSET)    # zurück zum Öffner
 
-                # Foto unten
-                picture.take(camera, wID, zID, posX, posY, "unten")
-                time.sleep(0.5)
+                # 3. Vakuumpumpe über Zelle (Pumpe ist -3 vom Öffner)
+                utils_stepper.runCell_x(True, PUMPE_OFFSET)     # Pumpe über Zelle
+                utils_stepper.runMM_z(True, 20)
+                steckdose(True)
+                utils_stepper.runMM_z(False, 20)
+                steckdose(False)
+                utils_stepper.runCell_x(False, PUMPE_OFFSET)    # zurück zum Öffner
 
-                # Ganz hoch
-                utils_stepper.runMM_z(False, 10)
+                # 4. Foto unten (wieder Kamera über Zelle)
+                utils_stepper.runCell_x(False, KAMERA_OFFSET)   # Kamera über Zelle
+                utils_stepper.runMM_z(True, 20)
+                picture.take(camera, wID, zID, x, y, "unten")
+                utils_stepper.runMM_z(False, 20)
+                utils_stepper.runCell_x(True, KAMERA_OFFSET)    # zurück zum Öffner
 
-                # Zurück zur Kamera
-                utils_stepper.runCell_x(False, 8)
-
-                # Nächste Zelle
+                # 5. Nächste Zelle
                 utils_stepper.runCell_x(True, 1)
-                posX += 1
 
-            # Neue Reihe
-            posY += 1
-            posX = 0
+            # Neue Reihe: X zurücksetzen, Y weiter
             utils_stepper.runCell_y(False, 1)
             utils_stepper.runCell_x(False, x_Cells)
 

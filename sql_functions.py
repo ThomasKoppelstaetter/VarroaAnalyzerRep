@@ -83,6 +83,7 @@ def get_waben():
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT wID, Datum FROM Wabe ORDER BY Datum DESC")
     data = cursor.fetchall()
+    cursor.close()
     conn.close()
     return data
 
@@ -118,5 +119,6 @@ def get_zellen_by_wabe(wID):
     """, (wID,))
 
     data = cursor.fetchall()
+    cursor.close()
     conn.close()
     return data
