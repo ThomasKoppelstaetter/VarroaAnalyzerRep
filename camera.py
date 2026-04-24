@@ -8,13 +8,16 @@ import threading
 class Camera:
     def __init__(self):
         self._frame = None
+        self._last_frame_time = 0.0
         self._new_frame = threading.Condition()
         self._running = True
+        self._capture_gen = 0  # Generationszähler um alte hängende Threads zu stoppen
 
         self.picam2 = self._create_and_start()
+        self._start_capture_thread()
 
-        self._thread = threading.Thread(target=self._capture_loop, daemon=True)
-        self._thread.start()
+        self._watchdog_thread = threading.Thread(target=self._watchdog_loop, daemon=True)
+        self._watchdog_thread.start()
 
     def _create_and_start(self):
         cam = Picamera2()
@@ -22,19 +25,36 @@ class Camera:
         cam.start()
         return cam
 
-    def _capture_loop(self):
-        """Leert den V4L2-Buffer kontinuierlich. Startet die Kamera neu bei Pipeline-Crash."""
-        while self._running:
+    def _start_capture_thread(self):
+        gen = self._capture_gen
+        threading.Thread(target=self._capture_loop, args=(gen,), daemon=True).start()
+
+    def _capture_loop(self, gen):
+        while self._running and gen == self._capture_gen:
             try:
                 frame = self.picam2.capture_array()
+                self._last_frame_time = time.time()
                 with self._new_frame:
                     self._frame = frame
                     self._new_frame.notify_all()
             except Exception as e:
-                print(f"[Camera] Pipeline-Fehler: {e} — starte Kamera neu...")
-                self._restart()
+                if gen == self._capture_gen:
+                    print(f"[Camera] Fehler: {e}")
+                return
 
-    def _restart(self):
+    def _watchdog_loop(self):
+        # Startup-Zeit abwarten bevor Watchdog aktiv wird
+        time.sleep(5.0)
+        self._last_frame_time = time.time()
+
+        while self._running:
+            time.sleep(3.0)
+            if self._running and (time.time() - self._last_frame_time) > 3.0:
+                print("[Camera] Watchdog: keine Frames seit 3s — starte Kamera neu...")
+                self._do_restart()
+
+    def _do_restart(self):
+        self._capture_gen += 1  # Alten hängenden capture_loop-Thread invalidieren
         try:
             self.picam2.stop()
         except Exception:
@@ -48,6 +68,8 @@ class Camera:
 
         try:
             self.picam2 = self._create_and_start()
+            self._last_frame_time = time.time()
+            self._start_capture_thread()
             print("[Camera] Kamera erfolgreich neu gestartet")
         except Exception as e:
             print(f"[Camera] Neustart fehlgeschlagen: {e}")
@@ -60,7 +82,7 @@ class Camera:
                 frame = self._frame
             if frame is None:
                 continue
-            ret, buffer = cv2.imencode('.jpg', frame)
+            _, buffer = cv2.imencode('.jpg', frame)
             frame_bytes = buffer.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
@@ -78,7 +100,6 @@ class Camera:
 
     def release(self):
         self._running = False
-        self._thread.join(timeout=3.0)
         try:
             self.picam2.stop()
         except Exception:
