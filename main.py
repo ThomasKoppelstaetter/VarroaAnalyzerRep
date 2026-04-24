@@ -10,8 +10,8 @@ import os
 # KONFIGURATION
 # =========================
 
-x_Cells = 20
-y_Cells = 10
+x_Cells = 5
+y_Cells = 3
 
 STECKDOSE_IP = "http://172.20.10.5"
 
@@ -53,59 +53,64 @@ def main_scan(camera):
 
     print("Main Scan gestartet")
 
-    wID = create_wabe()
-    print(f"Wabe erstellt: ID {wID}")
-
     try:
-        for y in range(y_Cells):
-            if not running:
-                break
+        while running:
+            wID = create_wabe()
+            print(f"Neue Wabe erstellt: ID {wID}")
 
-            for x in range(x_Cells):
+            for y in range(y_Cells):
                 if not running:
                     break
 
-                print(f"--- Zelle X={x}, Y={y} ---")
+                for x in range(x_Cells):
+                    if not running:
+                        break
 
-                zID = create_zelle(wID, x, y)
+                    print(f"--- Zelle X={x}, Y={y} ---")
 
-                # 1. Zelle öffnen (Öffner ist Nullpunkt, bereits über der Zelle)
-                utils_stepper.runMM_z(True, 20)
-                open_cell()
-                utils_stepper.runMM_z(False, 20)
+                    zID = create_zelle(wID, x, y)
 
-                # 2. Foto oben (Kamera ist +8 vom Öffner)
-                utils_stepper.runCell_x(False, KAMERA_OFFSET)   # Kamera über Zelle
-                utils_stepper.runMM_z(True, 20)
-                picture.take(camera, wID, zID, x, y, "oben")
-                utils_stepper.runMM_z(False, 20)
-                utils_stepper.runCell_x(True, KAMERA_OFFSET)    # zurück zum Öffner
+                    # 1. Zelle öffnen (Öffner ist Nullpunkt, bereits über der Zelle)
+                    utils_stepper.runMM_z(True, 20)
+                    open_cell()
+                    utils_stepper.runMM_z(False, 20)
 
-                # 3. Vakuumpumpe über Zelle (Pumpe ist -3 vom Öffner)
-                utils_stepper.runCell_x(True, PUMPE_OFFSET)     # Pumpe über Zelle
-                utils_stepper.runMM_z(True, 20)
-                steckdose(True)
-                utils_stepper.runMM_z(False, 20)
-                steckdose(False)
-                utils_stepper.runCell_x(False, PUMPE_OFFSET)    # zurück zum Öffner
+                    # 2. Foto oben (Kamera ist +8 vom Öffner)
+                    utils_stepper.runCell_x(False, KAMERA_OFFSET)   # Kamera über Zelle
+                    utils_stepper.runMM_z(True, 20)
+                    picture.take(camera, wID, zID, x, y, "oben")
+                    utils_stepper.runMM_z(False, 20)
+                    utils_stepper.runCell_x(True, KAMERA_OFFSET)    # zurück zum Öffner
 
-                # 4. Foto unten (wieder Kamera über Zelle)
-                utils_stepper.runCell_x(False, KAMERA_OFFSET)   # Kamera über Zelle
-                utils_stepper.runMM_z(True, 20)
-                picture.take(camera, wID, zID, x, y, "unten")
-                utils_stepper.runMM_z(False, 20)
-                utils_stepper.runCell_x(True, KAMERA_OFFSET)    # zurück zum Öffner
+                    # 3. Vakuumpumpe über Zelle (Pumpe ist -3 vom Öffner)
+                    utils_stepper.runCell_x(True, PUMPE_OFFSET)     # Pumpe über Zelle
+                    utils_stepper.runMM_z(True, 20)
+                    steckdose(True)
+                    utils_stepper.runMM_z(False, 20)
+                    steckdose(False)
+                    utils_stepper.runCell_x(False, PUMPE_OFFSET)    # zurück zum Öffner
 
-                # 5. Nächste Zelle
-                utils_stepper.runCell_x(True, 1)
+                    # 4. Foto unten (wieder Kamera über Zelle)
+                    utils_stepper.runCell_x(False, KAMERA_OFFSET)   # Kamera über Zelle
+                    utils_stepper.runMM_z(True, 20)
+                    picture.take(camera, wID, zID, x, y, "unten")
+                    utils_stepper.runMM_z(False, 20)
+                    utils_stepper.runCell_x(True, KAMERA_OFFSET)    # zurück zum Öffner
 
-            # Neue Reihe: X zurücksetzen, Y weiter
-            if not running:
-                break
-            utils_stepper.runCell_y(False, 1)
-            utils_stepper.runCell_x(False, x_Cells)
+                    # 5. Nächste Zelle
+                    utils_stepper.runCell_x(True, 1)
 
-        print("Scan abgeschlossen")
+                # Neue Reihe: X zurücksetzen, Y weiter
+                if not running:
+                    break
+                utils_stepper.runCell_y(False, 1)
+                utils_stepper.runCell_x(False, x_Cells)
+
+            # Zurück auf (0, 0) für nächste Runde
+            if running:
+                print("Zurück auf Nullpunkt...")
+                utils_stepper.runCell_y(True, y_Cells)
+                print("Runde abgeschlossen, starte neu")
 
     finally:
         print("Cleanup läuft...")

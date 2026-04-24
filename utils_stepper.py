@@ -48,17 +48,17 @@ def runMM_x(direction, distance):
         GPIO.output(dirx, GPIO.HIGH)
         for step_counter in range(steps):
             GPIO.output(stepx, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepx, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     elif (direction == False):
         print("x-direction: " + str(direction) + ", distance: " + str(distance) + " mm")
         GPIO.output(dirx, GPIO.LOW)
         for step_counter in range(steps):
             GPIO.output(stepx, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepx, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     else:
         print("Direction Error")
     GPIO.output(enx, GPIO.HIGH)
@@ -70,17 +70,17 @@ def runMM_y(direction, distance):
         GPIO.output(diry, GPIO.HIGH)
         for step_counter in range(steps):
             GPIO.output(stepy, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepy, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     elif (direction == False):
         print("y-direction: " + str(direction) + ", distance: " + str(distance) + " mm")
         GPIO.output(diry, GPIO.LOW)
         for step_counter in range(steps):
             GPIO.output(stepy, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepy, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     else:
         print("Direction Error")
     GPIO.output(eny, GPIO.HIGH) 
@@ -92,17 +92,17 @@ def runMM_z(direction, distance):
         GPIO.output(dirz, GPIO.HIGH)
         for step_counter in range(steps):
             GPIO.output(stepz, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepz, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     elif (direction == False):
         print("z-direction: " + str(direction) + ", distance: " + str(distance) + " mm")
         GPIO.output(dirz, GPIO.LOW)
         for step_counter in range(steps):
             GPIO.output(stepz, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepz, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     else:
         print("Direction Error")
     GPIO.output(enz, GPIO.HIGH)
@@ -116,17 +116,17 @@ def runCell_x(direction, distance):
         GPIO.output(dirx, GPIO.HIGH)
         for step_counter in range(steps):
             GPIO.output(stepx, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepx, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     elif (direction == False):
         print("x-direction: " + str(direction) + ", distance: " + str(distance) + " Cell")
         GPIO.output(dirx, GPIO.LOW)
         for step_counter in range(steps):
             GPIO.output(stepx, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepx, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     else:
         print("Direction Error")
     GPIO.output(enx, GPIO.HIGH)
@@ -138,17 +138,17 @@ def runCell_y(direction, distance):
         GPIO.output(diry, GPIO.HIGH)
         for step_counter in range(steps):
             GPIO.output(stepy, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepy, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     elif (direction == False):
         print("y-direction: " + str(direction) + ", distance: " + str(distance) + " Cell")
         GPIO.output(diry, GPIO.LOW)
         for step_counter in range(steps):
             GPIO.output(stepy, GPIO.HIGH)
-            time.sleep(0.001)
+            time.sleep(0.0005)
             GPIO.output(stepy, GPIO.LOW)
-            time.sleep(0.001)
+            time.sleep(0.0005)
     else:
         print("Direction Error")
     GPIO.output(eny, GPIO.HIGH) 
