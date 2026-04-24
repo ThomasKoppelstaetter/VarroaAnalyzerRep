@@ -78,7 +78,7 @@ def main_scan(camera):
                     # 2. Foto oben (Kamera ist +8 vom Öffner)
                     utils_stepper.runCell_x(False, KAMERA_OFFSET)   # Kamera über Zelle
                     utils_stepper.runMM_z(True, 20)
-                    picture.take(camera, wID, zID, x, y, "oben")
+                    # picture.take(camera, wID, zID, x, y, "oben")
                     utils_stepper.runMM_z(False, 20)
                     utils_stepper.runCell_x(True, KAMERA_OFFSET)    # zurück zum Öffner
 
@@ -93,7 +93,7 @@ def main_scan(camera):
                     # 4. Foto unten (wieder Kamera über Zelle)
                     utils_stepper.runCell_x(False, KAMERA_OFFSET)   # Kamera über Zelle
                     utils_stepper.runMM_z(True, 20)
-                    picture.take(camera, wID, zID, x, y, "unten")
+                    # picture.take(camera, wID, zID, x, y, "unten")
                     utils_stepper.runMM_z(False, 20)
                     utils_stepper.runCell_x(True, KAMERA_OFFSET)    # zurück zum Öffner
 
