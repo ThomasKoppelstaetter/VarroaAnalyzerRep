@@ -21,7 +21,11 @@ class Camera:
 
     def _create_and_start(self):
         cam = Picamera2()
-        cam.configure(cam.create_preview_configuration(main={"size": (640, 480)}))
+        config = cam.create_preview_configuration(
+            main={"size": (640, 480)},
+            controls={"FrameDurationLimits": (66666, 66666)}  # 15fps statt 30fps → halbe DMA-Last
+        )
+        cam.configure(config)
         cam.start()
         return cam
 
